@@ -1,5 +1,5 @@
 # csda 1050 Capstone project
-
+# by Eugene 
 
 
 Here you will outline your entire project. Detail the purpose, background on the project, and contents found here. 
