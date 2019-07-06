@@ -1,5 +1,7 @@
 # csda 1050 Python Project
-# by Eugene 
+## by Eugene 
+
+This project is Capstone for CSDA1050
 
 
 
