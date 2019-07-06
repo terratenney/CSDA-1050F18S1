@@ -1,4 +1,4 @@
-# csda 1050 template
+# csda 1050 Python Project
 
 
 
