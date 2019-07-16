@@ -1,41 +1,4 @@
-# csda 1050 template
+# csda 1050 - Abstract - Yelp Restaurant reviews
 
-
-
-Here you will outline your entire project. Detail the purpose, background on the project, and contents found here. 
-
-  - This should include how to install dependecies and run the project from start to finish
-  - Use proper formatting here - make it look pretty
-  - Magic, not how I want to see the results appear
-
-# Updates Limitations Requirements?
-
-  - If you have data here - put it in it's own data folder. If it's downloadable link to it. 
-  - Don't post passwords, usernames, or private information here.
-
-
-You can also:
-  - Link files from GitHub, Dropbox, Google Drive and One Drive..the web etc. 
-  - Be creative and look around GitHub for great "Readme.md" examples. 
- 
-* [Google] - its your friend for Markdown editors and syntax
-
-
-### Installation
-
-Often these have explicit directions per platform. If you're using anaconda/python make sure to list the versions/libraies. 
-e.g., Install the dependencies and devDependencies and start the server.
-
-```sh
-$ cd data
-$ npm install -d
-$ node app
-```
-
-For production environments...
-
-```
-conda install -c conda-forge tensorflow-gpu
-pip install pandas
-etc. etc. 
-```
+Yelp is an American multinational corporation founded in 2004 which aimed at helping people locate local business based on social networking functionally and reviews. Yelp also has a star rating system that lets users easily see what the general opinion about a particular establishment is without having to read all the reviews for that particular business.
+Millions of people use Yelp restaurant reviews in their food choice decision-making. Empirical data research demonstrated that a one-star increase led to 59% increase in revenue of independent restaurants (Lucas, 2011). Therefore, we see great potential of Yelp dataset as a valuable insights repository either for customers in their food hunting quest or for businesses to optimize their operations and align themselves with their market.
