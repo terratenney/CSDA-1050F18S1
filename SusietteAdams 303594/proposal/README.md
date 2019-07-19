@@ -6,20 +6,35 @@ Avaya Research Center is evaluating cost of living for both renters and home buy
 In this response the Canadian government decided to step in and attempt to slow and bring down prices naturally. In April 2017 Canada Federal Finance Minister, Bill Morneau, met with Charles Sousa and John Tory, to attempt to find a solution. As a result of this, they implemented a foreign buyer tax. This is because foreign purchase a lot of the homes that cause the housing price increase. Most of those homes are now rental properties. In addition, the provincial Fair Housing Plan set in place stricter rent controls. Uninsured renters are now required to pass a stress test in order to see if they can handle a rise in rates. Ontario has created a Fair Housing Plan made up of 16 points to help combat the growth and make homes more affordable. These 16 points are:
 
 1.Non-resident speculation tax
+
 2.Rent is only allowed to rise at rates posted in annual provincial rental increase guideline
+
 3.Develop standard leases that would further help protect tenants and ensure landlords
+
 4.Create program to balance the value of surplus land assets
+
 5.Put a vacant properties tax into place
+
 6.Tax to make sure new apartment complexes is similar to other current complex properties
+
 7.Introduce a 5-year program to facilitate the building of more rental apartments
+
 8.Make it easier to use property taxes to generate more development opportunity
+
 9.Create Housing Supply team to help uncover and fix barriers to housing development
+
 10.Work to fight tax avoidance practices
+
 11.Reassess rules involving customer representation in real estate transactions
+
 12.Creation of housing group to advise the government about the state of the housing market
+
 13.More education for consumers about their real estate rates
+
 14.Create more through reporting requirements for real estate sales
+
 15.Improve reliability of elevators in Ontario buildings
+
 16.Updating the Growth Plan for the Greater Golden Horseshoe 
 
 Objectives
