@@ -16,10 +16,10 @@ Per Mr.Jeff Vidler from Audience Insights Inc mentioned in the project meeting, 
 This project will analyze the podcasing listeners in Canada. In Canada, this is just 3rd year to analysis the podcasting data. We will use The Canadian Podcast Listener 2019 Survey Data to focuse on below research questions but will not limite to these:
 
 * To what extent is income affecting people listening podcast?
-* To what exten are gender and age affecting people listening podcast?
-* To what exten are devices affecting listeners of podcasts? 
+* To what extent are gender and age affecting people listening podcast?
+* To what extent are devices affecting listeners of podcasts? 
 * What are the popular 10 podcasts listed from the survery data?
-* To what exten are French and English lauguage affecting people listening podcast?
+* To what extent are French and English lauguage affecting people listening podcast?
 * How listeners react to the advertising in podcasts?
 
 All above research questions are subject to the availabity of the suvery data.
