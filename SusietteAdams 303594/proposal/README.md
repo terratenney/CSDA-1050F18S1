@@ -45,20 +45,35 @@ Limitations/Contraints
 Project Timeline
 
 Week 1:
+
 oSignup for GitHub, research python libraries and data APIs. Start developing a topic area/dataset for inquiry.
+
 Week 2:
+
 oBegin data collection, assembling methodology for Exploratory Data Analysis. ETL work into data warehousing. Begin exploring data and documenting issues/limitations/needs understanding needs/limitations regarding research question (might need to adjust question, scope, data, etc.).
+
 Week 3:
+
 oSubmission of EDA sprint (via GitHub/Moodle). Collect/Augment/Refine project according to Sprint 1 findings. Develop several analytical methodologies (these should be methods you are interested in learning – like Topic modelling or sentiment analysis, or social network analysis, etc.)
+
 Week 4:
+
 oAll data collection should be completed. The methodology should be finalized.
+
 Week 5
+
 oSubmission of Sprint 2 to GitHub/. Includes codebase, report (brief), and plan for analysis.
+
 Week 6
+
 oStart final sprint prepare for final submission.
+
 Week 7
+
 oWork on final project.
+
 Week 8
+
 oFinal report – pdf/word doc 3-5 pages of background, research question, methodology, results, conclusion GitHub Repo. Well documented – meaning someone who comes across it randomly should know exactly what it is, how to re-create it, and what your repo contains Final notebooks/analysis/results. Each sprint notebook documented, detailed, and refined.
 
 Document Overview
