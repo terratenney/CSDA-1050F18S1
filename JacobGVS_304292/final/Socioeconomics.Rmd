@@ -1,0 +1,97 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Start by loading the various libraries and packages we will be using.
+
+The "Pacman" package will automatically install any packages you do not currently have installed and load the applicable libraries.
+
+```{r message=FALSE, warning=FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(leaflet, sp, rgdal, geojsonio, spatialEco, maptools, dyplr, curl)
+```
+
+
+## Create our Data Tables
+
+#### KSI Pedestrian Dataset
+
+This dataset is a subset of the Killed and Seriously Injured (KSI) dataset collected by the Toronto Police Service from 2008-2018. These events include any serious or fatal collisions where a Pedestrian is involved. To learn more about Pedestrians related collisions in Toronto you can follow this link: http://data.torontopolice.on.ca/pages/pedestrians
+```{r}
+json_ped <- FROM_GeoJson("https://opendata.arcgis.com/datasets/3dedc9bff625450990b8d480f397ad3f_0.geojson")
+ksi_ped <- geojsonio::geojson_read("https://opendata.arcgis.com/datasets/3dedc9bff625450990b8d480f397ad3f_0.geojson", what = "sp")
+head(ksi_ped)
+```
+
+KSI TTC/Municipal Vehicle Dataset
+
+This dataset is a subset of the Killed and Seriously Injured (KSI) dataset collected by the Toronto Police Service from 2008-2018. These events include any serious or fatal collision involving an operator or passenger of a TTC, Transit Vehicle, streetcar or Municipal Vehicle. To learn more about TTC-Municipal Vehicle related collisions in Toronto you can follow this link: http://data.torontopolice.on.ca/pages/ttc-municipal-vehicle
+```{r}
+json_ttc <- FROM_GeoJson("https://opendata.arcgis.com/datasets/dc4751278e604d65b0886b9765d4b551_0.geojson")
+ksi_ttc <- geojsonio::geojson_read("https://opendata.arcgis.com/datasets/dc4751278e604d65b0886b9765d4b551_0.geojson", what = "sp")
+head(ksi_ttc)
+```
+
+Merge KSI_TTC and KSI_Ped
+
+As you will have noticed from the descritpions both the KSI_PED and KSI_TTC datasets are themselves subsets of the Toronto Police Services' KSI Dataset. We downloaded them as seperate dataframes to enable faster downloads as they make up a small portion of the full KSI dataset, which would take significantly more time to download and sort.
+Because they come from the same base dataset and have the same schema we can merge them back into one dataframe to work with. We will merge them based on the "Index" to ensure there are no duplicates created due to the merging process.
+```{r}
+KSI_merged <- merge(ksi_ped,ksi_ttc, by="Index")
+```
+
+
+We can now use the leaflet package to get an idea of where accidents are occuring. To make this more readable I have had the system autocluster the accidents. These clusters don't have any relation to specific neighbourhoods and will need to be adjusted later so that the clusters are in line with our income data.
+```{r}
+leaflet(KSI_merged) %>%
+  addTiles() %>%
+  addMarkers(lng = ksi_ped$LONGITUDE, lat = ksi_ped$LATITUDE, clusterOptions = markerClusterOptions())
+```
+
+Neighbourhood profiles - toronto
+
+```{r}
+set_wd <- function() {
+  library(rstudioapi) # make sure you have it installed
+current_path <- getActiveDocumentContext()$path 
+setwd(dirname(current_path ))
+print( getwd() )
+}
+
+download.file("https://ckan0.cf.opendata.inter.sandbox-toronto.ca/download_resource/1d02b0f0-d735-4469-8f71-ea6d96b319e4?format=geojson&projection=4326", destfile = "Neighbourhoods.geojson", )
+
+nbh <- geojsonio::geojson_read("Neighbourhoods.geojson", what = "sp")
+
+head(nbh)
+```
+
+
+```{r}
+leaflet(nbh) %>%
+  addTiles() %>%
+  addPolygons()
+```
+
+
+Assign each Spatial data point to a polygon
+```{r}
+ksi_nbh <- point.in.poly(KSI_merged, nbh)
+head(ksi_nbh@data)
+```
+
+```{r}
+# Number of points in each polygon
+tapply(ksi_nbh@data$ObjectId, ksi_nbh@data$OBJECTID, FUN=length)
+
+# Mean lead in each polygon
+tapply(ksi_nbh@data$ObjectId, ksi_nbh@data$OBJECTID, FUN=mean)
+```
+
+```{r}
+leaflet(ksi_nbh) %>%
+  addTiles() %>%
+  addMarkers(lng = ksi_nbh$LONGITUDE.x , lat = ksi_nbh$LATITUDE.x , clusterOptions = ksi_nbh$OBJECTID) %>%
+```
+
