@@ -1,0 +1,2 @@
+VALUE0	Household Total Income (Current Year) | Household Aggregate Income (Current Year $), 2016
+VALUE1	Household Total Income (Current Year) | Household Average Income (Current Year $), 2016
