@@ -1,0 +1,3 @@
+VALUE0	# Household Total Income After-Tax (Current Year) | Total Households for After-Tax Income, 2016
+VALUE1	Household Total Income (Current Year) | Household Aggregate Income (Current Year $), 2016
+VALUE2	Household Total Income (Current Year) | Household Average Income (Current Year $), 2016

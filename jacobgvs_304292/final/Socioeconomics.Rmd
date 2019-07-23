@@ -1,0 +1,165 @@
+---
+title: "Socioeconomics of Pedestrian Accidents"
+output: html_notebook
+---
+
+
+Start by loading the various libraries and packages we will be using.
+
+The "Pacman" package will automatically install any packages you do not currently have installed and load the applicable libraries.
+
+```{r message=FALSE, warning=FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(leaflet, sp, sf, shapefiles, rgdal, geojsonio, geojsonR, spatialEco, maptools, dyplr, curl)
+```
+
+
+## Create our Data Tables
+
+#### KSI Pedestrian Dataset
+
+This dataset is a subset of the Killed and Seriously Injured (KSI) dataset collected by the Toronto Police Service from 2008-2018. These events include any serious or fatal collisions where a Pedestrian is involved. To learn more about Pedestrians related collisions in Toronto you can follow this link: http://data.torontopolice.on.ca/pages/pedestrians
+
+We will use the FROM_GeoJson command from the "geojsonR" package to download a json file from the provided URL. The geojson_read command from the "geojsonio" and formating form the "sp" package can then be used to read the json and generate a SpatialPointsDataFrame 
+```{r}
+json_ped <- FROM_GeoJson("https://opendata.arcgis.com/datasets/3dedc9bff625450990b8d480f397ad3f_0.geojson")
+ksi_ped <- geojsonio::geojson_read("https://opendata.arcgis.com/datasets/3dedc9bff625450990b8d480f397ad3f_0.geojson", what = "sp")
+head(ksi_ped)
+```
+
+#### KSI TTC/Municipal Vehicle Dataset
+
+This dataset is a subset of the Killed and Seriously Injured (KSI) dataset collected by the Toronto Police Service from 2008-2018. These events include any serious or fatal collision involving an operator or passenger of a TTC, Transit Vehicle, streetcar or Municipal Vehicle. To learn more about TTC-Municipal Vehicle related collisions in Toronto you can follow this link: http://data.torontopolice.on.ca/pages/ttc-municipal-vehicle
+
+We will use the FROM_GeoJson command from the "geojsonR" package to download a json file from the provided URL. The geojson_read command from the "geojsonio" and formating form the "sp" package can then be used to read the json and generate a SpatialPointsDataFrame 
+```{r}
+json_ttc <- FROM_GeoJson("https://opendata.arcgis.com/datasets/dc4751278e604d65b0886b9765d4b551_0.geojson")
+ksi_ttc <- geojsonio::geojson_read("https://opendata.arcgis.com/datasets/dc4751278e604d65b0886b9765d4b551_0.geojson", what = "sp")
+head(ksi_ttc)
+```
+
+#### Merge KSI_TTC and KSI_Ped
+
+As you will have noticed from the descritpions both the KSI_PED and KSI_TTC datasets are themselves subsets of the Toronto Police Services' KSI Dataset. We downloaded them as seperate dataframes to enable faster downloads as they make up a small portion of the full KSI dataset, which would take significantly more time to download and sort.
+Because they come from the same base dataset and have the same schema we can merge them back into one dataframe to work with. We will merge them based on the "Index" to ensure there are no duplicates created due to the merging process.
+```{r}
+ksi_merged <- merge(ksi_ped,ksi_ttc, by="Index")
+```
+
+
+#### Neighbourhood Boundaries - City of Toronto
+
+The City of Toronto also maintains a list that defines the boundaries of all the neighbourhoods in the city. A file containing the spatial data required to map these neighbourhoods can be downloaded form the City of Toronto open data portal. Due to how this file will download, unlike the KSI data, we cannot directly read the GeoJson file but have to download it before the file can be read.
+```{r include=FALSE}
+set_wd <- function() {
+  library(rstudioapi) # make sure you have it installed
+current_path <- getActiveDocumentContext()$path 
+setwd(dirname(current_path))
+print( getwd() )
+}
+
+download.file("https://ckan0.cf.opendata.inter.sandbox-toronto.ca/download_resource/1d02b0f0-d735-4469-8f71-ea6d96b319e4?format=geojson&projection=4326", destfile = "datasets/Neighbourhoods.geojson", )
+
+nbh <- geojsonio::geojson_read("datasets/Neighbourhoods.geojson", what = "sp")
+
+head(nbh)
+```
+
+#### Simply Analytics - Census Data
+
+From Simply Analytics i have downloaded shapefiles containing average income by  census track and subdivision. These two shapefiles will usefull in drilling down beyond the neighbourhood.
+Both shapefiles can be uploaded into a spatial dataframe using the st_read command from the "sf" package we installed earlier then converting them to a SpatialPolygonsDataFrame.
+
+```{r}
+cen_shp1 <- st_read("datasets/SimplyAnalytics_C1/C1.shp")
+cen_spgdf1 <- as(cen_shp1, "Spatial")
+class(cen_spgdf1)
+```
+
+```{r}
+cen_shp2 <- st_read("datasets/SimplyAnalytics_C2/C2.shp")
+cen_spgdf2 <- as(cen_shp2, "Spatial")
+class(cen_spgdf2)
+```
+
+#### Additional Datatables
+
+One additional datatable may be needed depending on how we choose to cluster the KSI data.
+At a high level grouping accidents to a given neighbourhood as defined by the city then using the census data to further cluster by census track and subdivision will be ideal. I may need to pull the Neighbourhood Profiles data set from the city of Toronto to get an average income level by neighbourhood as this does not appear to be avaialble directly from the census datasets.
+
+
+## Reviewing the Datasets
+
+With our datasets downloaded we can start by looking through the data. Becasue we are dealing almost exclusively with spatial data the easiest way to get a handle on the data is by mapping it.
+To do this I will be using features from the "leaflet" package.
+
+#### KSI_merged Dataset
+
+Lets satrt by getting an idea of where accidents are occuring. The leaflet package will map the data for us. To make this more readable I have had the system autocluster the accidents. These clusters don't have any relation to specific neighbourhoods and will need to be adjusted later so that the clusters are in line with our other datasets.
+```{r}
+leaflet(ksi_merged) %>%
+  addTiles() %>%
+  addMarkers(lng = ksi_merged$LONGITUDE, lat = ksi_merged$LATITUDE, clusterOptions = markerClusterOptions())
+```
+
+This map will allow you to zoom in and the clusters will auto adjust as you zoom in and out. These clusters are based on proximity to a central point. Once you get to the lowest zoom levels, clicking on a cluster will map the individual accidents. Details for each accident are not currenlty included in the mapping.
+
+
+#### Neighbourhood Boundaries - City of Toronto
+
+Our next dataset contains the boundary lines for various neighbourhoods in Toronto. mapping this will begin to give some dimension to how we intend to cluster accidents going forward.
+```{r}
+leaflet(nbh) %>%
+  addTiles() %>%
+  addPolygons()
+```
+
+#### Simply Analytics - Census Data
+
+```{r}
+leaflet(cen_spgdf1) %>%
+  addTiles() %>%
+  addPolygons()
+```
+
+```{r}
+leaflet(cen_spgdf2) %>%
+  addTiles() %>%
+  addPolygons()
+```
+
+
+
+
+
+
+Assign each Spatial data point to a polygon
+```{r}
+ksi_nbh <- point.in.poly(KSI_merged, nbh)
+head(ksi_nbh@data)
+```
+
+```{r}
+# Number of points in each polygon
+tapply(ksi_nbh@data$ObjectId, ksi_nbh@data$OBJECTID, FUN=length)
+
+# Mean lead in each polygon
+tapply(ksi_nbh@data$ObjectId, ksi_nbh@data$OBJECTID, FUN=mean)
+```
+
+```{r}
+leaflet(ksi_nbh) %>%
+  addTiles() %>%
+  addMarkers(lng = ksi_nbh$LONGITUDE.x , lat = ksi_nbh$LATITUDE.x , clusterOptions = ksi_nbh$OBJECTID) %>%
+```
+
+
+```{r}
+cen_shp1 <- st_read("datasets/SimplyAnalytics_C1/C1.shp")
+```
+
+```{r}
+cen_spgdf1 <- as(cen_shp1, "Spatial")
+class(cen_spgdf1)
+```
+
