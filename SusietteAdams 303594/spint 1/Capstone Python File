@@ -1,20 +1,4 @@
 
-# csda 1050
-
-### Sprint
-Describe what is in here. 
-
-After evaluating the data by importing it into Python and doing some data clean up we realized the housing data have too many missing values and won’t be instumental for our analysis. The only datasets that seem to be functional is the Renter Household, Monthly Payments and the Annual Income after Tax datasets. We have decided that we have to change our research question to focus only on rental properties and exclude the house price data. Our new research question is to determine the most cost effective price for renter’s base on their household income.
-
-Describe what is needed to be done to run it. 
-
-We have used Python to do our analysis to run the codes and see thout puts you will have to have Python on you desktop.
-We would ike to take some more time to be more decriptive with our findings
-Our next step is to complete the data clean up process to prepare the data sets for modelling.
-
-#### Python Codes 
-#### Below are the codes that we have used so far to get a better understanding of our 3 datasets
-
 
 ```python
 # Loading packages
@@ -2128,4 +2112,3 @@ pmt.groupby('Geography', as_index=True)['Mortgage'].median()
 ```python
 
 ```
-
