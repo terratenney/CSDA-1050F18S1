@@ -1,5 +1,9 @@
 # Research Proposal
 
+Modified on Jul 22, 2019
+Removed the third objective
+Removed the entire section of Project Scope
+
 
 # Abstract
 
@@ -10,7 +14,7 @@ We understood that podcasting doesn't have long history. It was developed in 200
 # Problem Statment
 A rapdily increasing of updating personal digital devices and internet speed, they are many new things happen every day and also people share their personal experiences on social media. Podcast as a product which belongs to information technology era doesn't have long history, but it definitely affect our life. Podcasting has experienced a huge surge of interest in past several year (especially in the past three to four years). With Google reporting up to 10 million monthly searches for "podcast" via the search engine giant in 2019 based on information from Listennotes website. There are so much potentials in this field but also competition heats up for different podcast platforms. 
 
-Per Mr.Jeff Vidler from Audience Insights Inc mentioned in the project meeting, Podcasts reply on ads for their finance support but they have challenge to target the podcast listeners. The one major reason is podcast platforms can see listeners download the podcast episodes but unable to get much information about the listeners as almost all podcasts are completely free and listeners don't need to put their information such as credit card or names.
+Per Mr.Jeff Vidler from Audience Insights Inc mentioned in the project meeting, Podcasts reply on ads for their finance support but they have challenge to target the podcast listeners. The one major reason is podcast platforms can see listeners download the podcast episodes but are unable to get much information about the listeners as almost all podcasts are completely free and listeners don't need to put their information such as credit card or names.
 
 # Research Questions
 This project will analyze the podcasing listeners in Canada. In Canada, this is just 3rd year to analysis the podcasting data. We will use The Canadian Podcast Listener 2019 Survey Data to focuse on below research questions but will not limite to these:
@@ -34,12 +38,6 @@ Audience Insights Inc. is a media research consultancy pulling together teams of
 
 * To inform business opportunites in this growing media sector.
 
-* To identify growth areas compare with previous research.
-
-# Project Scope
-* Analyizing based on the dataset and survey provided by Audience Insights Inc.
-* Trending Month to Month in Past 12 Months.
-* Focus on podcast listeners segmentations: geographic, demographic, behavioral depending on available data.
 
 # Project Milestones
 * Sprint 1: Get dataset and clean up
