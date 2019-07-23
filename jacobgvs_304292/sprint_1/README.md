@@ -1,12 +1,58 @@
 
-# csda 1050
+# CSDA 1050
 
-### Sprint 1
-Describe what is in here. 
-Describe what is needed to be done to run it. 
-Describe what the purpose/results/findings were. 
+## Sprint 1
+
+### Describe what is in here. 
+
+This file contains the text and code as found in the Socioeconomics.Rmd file found in the "final" folder of this directory.
+
+This file goes through pulling the various online datasets that will be required as well as uploading the various data sets pulled from proprietary sources that are not available to be pulled directly online.
+
+There are 5 data sets being pulled in total:
+  - KSI Pedestrian Dataset - Toronto Police Services
+  - KSI TTC/Municipal Vehicle Dataset - Toronto Police Services
+  - Neighbourhood Boundaries - City of Toronto Open Data Portal
+  - 2 census data files pulled from Simply Analytics
+  
+All downloaded datasets can be found in the "final/Datasets" folder.
+
+The included code will download the various datasets and proceed to start mapping the various datasets.
+
+### Describe what is needed to be done to run it. 
+
+This project is being built in Rstudio.
+
+The RMD and all necessary datasets can be found in the "final" folder of this directory.
+
+To run the code, download the "final" folder to your computer, open the "Socioeconomics.Rmd" file and select to run all chunks.
+
+The code is written in such a way that it should automatically read all files based on the location you have saved the "final" folder.
+
+The "Socioeconomis.nb.html" files also found in the "final" folder contains a preview of the results of running the provided code.
 
 
+### Describe what the purpose/results/findings were. 
+
+##### Purpose:
+The purpose of this sprint was to ensure all necessary data had been obtained, to begin review and understanding of the data and to begin determining how the available data sets would need to be combined to best answer the central research question.
+
+##### Results and Findings:
+  - All data sets have been obtained and one additional dataset has been identified that may be required to facilitate clustering views.
+  - I had anticipated that the census data would group economic results at neighbpouhood level and that is not the case.
+  - I have identified most if not all the necessary data sets and succesfully mapped the spatial coordinates and polygons.
+  - I have identified a package that makes the mapping and review of spatial data relatively easy.
+ 
+##### Going Forward:
+  - Each accident in the KSI data now needs to be associated to a spatial polygon and average income statistic based on neighbourhod, census tract, and census subdivision.
+  - I have so far been unable to identify how to cross reference a SpatialPointsDataFrame with one or multiple SpatialPolygonsDataFrame(s) without loosing the ability to properly map the polygon boundaries and use those boundaries as divisions to the clustering.
+  - The maps produced are curently lacking in incident details and this will need to be fleshed out as the more pertinent details are tied in from the various datatables.
+
+
+
+
+
+### Current state of the project
 
 Start by loading the various libraries and packages we will be using.
 
