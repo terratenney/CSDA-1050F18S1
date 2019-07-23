@@ -50,7 +50,7 @@ ksi_merged <- merge(ksi_ped,ksi_ttc, by="Index")
 #### Neighbourhood Boundaries - City of Toronto
 
 The City of Toronto also maintains a list that defines the boundaries of all the neighbourhoods in the city. A file containing the spatial data required to map these neighbourhoods can be downloaded form the City of Toronto open data portal. Due to how this file will download, unlike the KSI data, we cannot directly read the GeoJson file but have to download it before the file can be read.
-```{r}
+```{r include=FALSE}
 set_wd <- function() {
   library(rstudioapi) # make sure you have it installed
 current_path <- getActiveDocumentContext()$path 
@@ -90,38 +90,47 @@ At a high level grouping accidents to a given neighbourhood as defined by the ci
 
 ## Reviewing the Datasets
 
+With our datasets downloaded we can start by looking through the data. Becasue we are dealing almost exclusively with spatial data the easiest way to get a handle on the data is by mapping it.
+To do this I will be using features from the "leaflet" package.
 
+#### KSI_merged Dataset
 
-We can now use the leaflet package to get an idea of where accidents are occuring. To make this more readable I have had the system autocluster the accidents. These clusters don't have any relation to specific neighbourhoods and will need to be adjusted later so that the clusters are in line with our income data.
+Lets satrt by getting an idea of where accidents are occuring. The leaflet package will map the data for us. To make this more readable I have had the system autocluster the accidents. These clusters don't have any relation to specific neighbourhoods and will need to be adjusted later so that the clusters are in line with our other datasets.
 ```{r}
-leaflet(KSI_merged) %>%
+leaflet(ksi_merged) %>%
   addTiles() %>%
-  addMarkers(lng = ksi_ped$LONGITUDE, lat = ksi_ped$LATITUDE, clusterOptions = markerClusterOptions())
+  addMarkers(lng = ksi_merged$LONGITUDE, lat = ksi_merged$LATITUDE, clusterOptions = markerClusterOptions())
 ```
 
-Neighbourhood profiles - toronto
-
-```{r}
-set_wd <- function() {
-  library(rstudioapi) # make sure you have it installed
-current_path <- getActiveDocumentContext()$path 
-setwd(dirname(current_path))
-print( getwd() )
-}
-
-download.file("https://ckan0.cf.opendata.inter.sandbox-toronto.ca/download_resource/1d02b0f0-d735-4469-8f71-ea6d96b319e4?format=geojson&projection=4326", destfile = "datasets/Neighbourhoods.geojson", )
-
-nbh <- geojsonio::geojson_read("datasets/Neighbourhoods.geojson", what = "sp")
-
-head(nbh)
-```
+This map will allow you to zoom in and the clusters will auto adjust as you zoom in and out. These clusters are based on proximity to a central point. Once you get to the lowest zoom levels, clicking on a cluster will map the individual accidents. Details for each accident are not currenlty included in the mapping.
 
 
+#### Neighbourhood Boundaries - City of Toronto
+
+Our next dataset contains the boundary lines for various neighbourhoods in Toronto. mapping this will begin to give some dimension to how we intend to cluster accidents going forward.
 ```{r}
 leaflet(nbh) %>%
   addTiles() %>%
   addPolygons()
 ```
+
+#### Simply Analytics - Census Data
+
+```{r}
+leaflet(cen_spgdf1) %>%
+  addTiles() %>%
+  addPolygons()
+```
+
+```{r}
+leaflet(cen_spgdf2) %>%
+  addTiles() %>%
+  addPolygons()
+```
+
+
+
+
 
 
 Assign each Spatial data point to a polygon
