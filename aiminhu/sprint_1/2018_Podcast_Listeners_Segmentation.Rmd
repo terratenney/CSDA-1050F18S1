@@ -1,0 +1,123 @@
+---
+title: "Canadian Podcast Listeners 2018 Data Analyzing - Sprint 1"
+author: "Aimin Amy Hu"
+date: '2019-07-24'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Background
+How podcasters make money as almost every podcast episode is free to download? One of the most popular ways that podcasters make money through sponsors. This mean podcasters need to find  companies are willing to pay them to get their brands in front of the podcast's listeners. Understanding the podcast's listeners is a key for sending relevant and effective ADS. However, there are chellenges to podcasters as they don't have data about the listeners even they saw people did download the episodes. Audience Insights Inc started to analyse Canadian podcast's listeners about 3yrs ago. They collected listener's data by survey questions.
+
+# Market Segmentation
+Market segmentation analysising will be used for 2018 Canadian Podcast Listeners' data. 
+Listeners segments enable us to understand the patterns that differentiate the listeners.Podcast listeners are comprised of deomgraphics that can be very attractive to sellers of goods and services.
+
+# Research Questions:
+
+* To what extent are income, household and education level affecting people listening podcast?
+* To what extent are gender and age affecting people listening podcast?
+* What are the popular 10 podcasts listed from the survery data?(gender, age)
+* How listeners react to the advertising in podcasts? (if I have time)
+
+# Part 1: Data Understanding
+
+### Data Source
+
+The original 2018 Canadian Podcast Listener data was txt files and SPSS file (.sav) from Audience Insights Inc. Thanks to our teacher Mr. Matthew Tenney to help us and convert to the .sav file to CSV file using PSPP
+
+Downloaded dataset and saved in local computer.
+
+Use R code to read CSV files from local computer.
+
+```{r results='hide', message=FALSE, warning=FALSE, results ='hide'}
+#start by loading some libraries
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(DT)
+library(knitr)
+library(grid)
+library(gridExtra)
+library(corrplot)
+library(methods)
+library(Matrix)
+library(reshape2)
+```
+
+```{r}
+#set up working directory - this will set the working directory to the same folder as your R studio RMD file - ensure that the CSVs outlined below are also in this folder
+set_wd <- function() {
+library(rstudioapi) # make sure you have it installed
+current_path <- getActiveDocumentContext()$path 
+setwd(dirname(current_path ))
+print( getwd() )
+}
+```
+```{r}
+# Read  CSV files along with header and replace empty values with "NA" when read the CSV file.
+
+listener_df <- fread("podcast18.csv",header = TRUE,na.strings = c("") )
+
+```
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+# Part 2: Data Exploration
+
+### Step 1: Data Summary
+
+```{r}
+cat("The number of observations are", nrow(listener_df))
+```
+```{r}
+cat("The number of variables are", ncol(listener_df))
+```
+### Step 2: Checking duplicated rows
+
+```{r}
+#checking if there are duplicated rows and removed it. distinct() keep only unique/distinct rows from a data frame.
+listener_df <- listener_df %>% distinct(id, .keep_all = TRUE)
+```       
+```{r}
+cat('Number of rows after removed duplicated rows (if there are) are: ', nrow(listener_df))          
+```
+There are no duplicated rows in this dataset.
+
+### Step 3: Missing values
+
+###### First: check columns with all values are NA
+
+We know this data came from a single-round survey. Surveys often involve ‘skip’ questions where sections are missed out if irrelevant e.g. details of spouse’s employment do not exist for the unmarried. With saying this, we may see a lot of NA (no response) in this dataset.
+
+Let us check if there are any columns with all values are NA(values in entire column are NA).
+
+```{r}
+# check columns with all values are NA and display the column's name
+variables_with_allNA = sapply(listener_df,function(x) all (is.na(x)))
+names(listener_df)[variables_with_allNA]
+```
+
+We see there are 184 variables (columns) in the dataset have NA for all values. This tells us that there is no any responses to these survey questions. As a company to rely on survey to get data, lack of response will definitely affect the data quality. Hence, the company should review these survey questions, make changes or remove these questions for the future survey.
+
+To keep the data clean for later use, we will subset dataset without these 183 variables.
+
+```{r}
+#remove columns with all values are NA
+listener_clean <-Filter(function(x) !(all(x=="")), listener_df)
+```
+```{r}
+cat("After removed columns with all values are NA, the number of columns are now", ncol(listener_clean))
+```
+
+###### Second: check if there is any NA in a column
+
+```{r}
+names(which(sapply(listener_clean, anyNA)))
+```
+There are 245 variables(columns) with at least one NA value in this data. Since there are many variables with NA values, we will deal with NA values in analysis stage.For now, we will keep them as it is in the dataset.
+
