@@ -1,0 +1,58 @@
+﻿Number,Field_Name,Description,ObjectId
+1,Index,Unique Identifier,1
+2,ACCNUM,Accident Number,2
+3,YEAR,Year Accident Occurred,3
+4,DATE,Date Accident Occurred,4
+5,TIME,Time Accident Occurred,5
+6,HOUR,Hour Accident Occurred,6
+7,STREET1,Street Accident Occurred,7
+8,STREET2,Street Accident Occurred,8
+9,OFFSET,Distance and direction of the accident ,9
+10,ROAD_CLASS,Road Classification,10
+11,District,City District,11
+12,LATITUDE,Latitude,12
+13,LONGITUDE,Longitude,13
+14,LOCCOORD,Location Coordinate,14
+15,ACCLOC,Accident Location,15
+16,TRAFFCTL,Traffic Control Type,16
+17,VISIBILITY,Environment Condition,17
+18,LIGHT,Light Condition,18
+19,RDSFCOND,Road Surface Condition,19
+20,ACCLASS,Classification of Accident,20
+21,IMPACTYPE,Initial Impact Type,21
+22,INVTYPE,Involvement Type ,22
+23,INVAGE,Age of Involved Party,23
+24,INJURY,Severity of Injury,24
+25,FATAL_NO,Sequential Number ,25
+26,INITDIR,Initial Direction of Travel,26
+27,VEHTYPE,Type of Vehicle,27
+28,MANOEUVER,Vehicle Manouever,28
+29,DRIVACT,Apparent Driver Action,29
+30,DRIVCOND,Driver Condition,30
+31,PEDTYPE,Pedestrian Crash Type - detail ,31
+32,PEDACT,Pedestrian Action,32
+33,PEDCOND,Condition of Pedestrian,33
+34,CYCLISTYPE,Cyclist Crash Type - detail,34
+35,CYCACT,Cyclist Action,35
+36,CYCCOND,Cyclist Condition,36
+37,PEDESTRIAN,Pedestrian Involved In Collision,37
+38,CYCLIST,Cyclists Involved in Collision,38
+39,AUTOMOBILE,Driver  Involved in Collision,39
+40,MOTORCYCLE,Motorcyclist  Involved in Collision,40
+41,TRUCK,Truck Driver  Involved in Collision,41
+42,TRSN_CITY_VEH,Transit or City Vehicle  Involved in Collision,42
+43,EMERG_VEH,Emergency Vehicle  Involved in Collision,43
+44,PASSENGER,Passenger Involved in Collision,44
+45,SPEEDING,Speeding Related Collision,45
+46,AG_DRIV,Aggressive and Distracted Driving Collision,46
+47,REDLIGHT,Red Light Related Collision,47
+48,ALCOHOL,Alcohol Related Collision,48
+49,DISABILITY,Medical or Physical Disability Related Collision,49
+50,Police Division,Police Division,50
+51,City Ward,City Ward,51
+52,City Ward ID ,City Ward Identificator,52
+53,Neighbourhood ID,Neighbourhood Identificator,53
+54,Neighbourhood Name,Neighbourhood Name,54
+55,FID,Object ID (Unique Identifier),55
+56,X,Latitude,56
+57,Y,Longitude,57
