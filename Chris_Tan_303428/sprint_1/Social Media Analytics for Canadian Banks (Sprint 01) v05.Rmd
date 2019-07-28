@@ -1,0 +1,415 @@
+---
+title: "Social Media Analytics for Canadian Banks v01"
+author: "Chris Tan, Student ID 303428"
+date: "22 July 2019"
+output:
+  word_document: default
+  html_document: default
+Instructor: Matthew Tenney
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# **Social Media Analytics for Canadian Banks (Sprint#1 Report)**
+##### *by Chris Tan (303428)*  
+
+**Abstract**  This is for the fulfillment of the York University’s Advanced Analytics Course Capstone Project.  The aim of this project is to uncover insights from the social media space through programmatic means.
+
+### **Project Scope**     
+Here are the boundaries of the project:
+
+1. Social media channel: Twitter (to include Facebook if time permits)
+
+2. Social media scope: Major Canadian Financial Institutions (FI) like BMO, CIBC, RBC, Scotiabank, TD (to include digital banks like Simplii, Tangerine, EQ if time permits)
+
+3. Comparison of the following insights across the above FIs: Sentiment Analysis (polarity and categorical); Word Cloud (conversation drivers); Key-word dendrogram (blend of sentiment and conversation drivers); Network Analysis (demographics and product segmentation). Paraphrases of these insights are given in the “Research Questions” section below
+
+### **Research Questions**     
+Here are the research questions for this project:
+
+1. Which bank has the most favourable / unfavourable trending opinion?
+
+2. What are the current financial products being discussed?
+
+3. What are the current emotions (anger, fear, anticipation, trust, surprise, sadness, joy, and disgust) towards each bank?
+
+4. What are the current sentiments towards trending financial product segments / categories (and the general network of terms being tweeted)?
+
+### **Introduction and overall approach**     
+Here is the general approach we adopted for Sprint#1:
+
+1. Data Preparation
+   1.1 Preliminaries (load libraries and set seed)
+   1.2 Data Access
+   1.3 Data extraction using twitteR
+   1.4 Data Storage
+
+2. Exploratory Data Analysis
+   2.1 Create the term-document matrix
+   2.2 Remove terms which have at least 98% of sparse elements
+   2.3 Visualise term counts (or frequency)
+   2.4 Data processing and normalization
+       2.4.1 Remove stop words
+       2.4.2 Remove terms which have at least 98% of sparse elements
+       2.4.3 Visualise term counts (or frequency)
+   2.5 Additional data processing and normalization
+   2.6 Explore clustering of terms
+   2.7 Plot the hierarchical clusters
+   2.8 Nonhierarchical k-means clustering of words/tweets
+   2.9 Find the pair of terms that appears frequently together
+       2.9.1 Pair of terms that appears frequently together
+       2.9.2 Find the network of terms
+3. Observations and recommendation
+
+### **Steps employed in Social Media (Twitter) Analytics using R**  
+
+#### **1. Data Preparation**
+
+##### 1.1 Preliminaries
+```{r}
+options(warn=-1) # Suppress warnings to make output more readable
+
+# This is tweets data extraction and other utilities specific to Twitter
+suppressMessages(library(twitteR))
+
+# Core data analytics packages like ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr, forcats
+suppressMessages(library(tidyverse))
+
+# Primary text mining package
+suppressMessages(library(tm))
+
+set.seed(123)
+```
+
+##### 1.2 Data Access
+```{r}
+# set the credentials
+CONSUMER_SECRET <- 'Your CONSUMER_SECRET'
+CONSUMER_KEY <- 'Your CONSUMER_KEY'
+ACCESS_TOKEN <- 'Your ACCESS_TOKEN'
+ACCESS_TOKEN_SECRET <- 'Your ACCESS_TOKEN'
+
+# Connect to twitter app. Select 2 in the console
+setup_twitter_oauth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+```
+
+##### 1.3 Data extraction using twitteR
+```{r}
+setwd("/Users/sgchr/Documents/CSDA1050/Data/")
+
+# Get tweets separately for each bank for two reasons (1) Twitter's free developer account has limits to search terms (2) Easier to do analysis by individual banks later
+
+# Get Cibc tweets
+terms <- c("cibc","Canadian Imperial Bank of Commerce", "CanadianImperialBankofCommerce", "CIBCForTheFans")
+terms_search <- paste(terms, collapse = " OR ") # Insert "OR between each term
+Cibc <- searchTwitter(terms_search, n=1000, since='2019-07-07', until='2019-07-22')
+
+# Get Rbc tweets
+terms <- c("rbc", "royal bank of canada", "royalbankofcanada")
+terms_search <- paste(terms, collapse = " OR ") # Insert "OR between each term
+Rbc <- searchTwitter(terms_search, n=1000, lang="en", since='2019-07-07', until='2019-07-22')
+
+# Get Td tweets
+#terms <- c("tdbank", "td bank", "tdgroup", "td group", "td bank group", "tdbankgroup", "td canada trust", "td canadatrust", "tdcanadatrust") ### no tweets
+terms <- c("toronto dominion bank", "td bank", "TD bank", "TD Bank", "#tdbank", "#TDBank")
+terms_search <- paste(terms, collapse = " OR ") # Insert "OR between each term
+Td <- searchTwitter(terms_search, n=1000, lang="en", since='2019-07-07', until='2019-07-22')
+
+# Get Bmo tweets
+terms <- c("bmo", "bank of montreal", "bankofmontreal", "bmoharris")
+terms_search <- paste(terms, collapse = " OR ") # Insert "OR between each term
+Bmo <- searchTwitter(terms_search, n=1000, lang="en", since='2019-07-07', until='2019-07-22')
+
+# Get Bns tweets
+terms <- c("scotiabank", "scotia bank")
+terms_search <- paste(terms, collapse = " OR ") # Insert "OR between each term
+Bns <- searchTwitter(terms_search, n=1000, lang="en", since='2019-07-07', until='2019-07-22')
+```
+
+##### 1.4 Data storage
+```{r}
+# Convert into dataframe for easier analysis later
+Cibc_df <- twListToDF(Cibc) # rework logic for case when list is NULL
+Rbc_df <- twListToDF(Rbc)
+Td_df <- twListToDF(Td)
+Bmo_df <- twListToDF(Bmo)
+Bns_df <- twListToDF(Bns)
+
+# Store the dataframed tweets
+write.table(Cibc_df,"/Users/sgchr/Documents/CSDA1050/Data/Cibc.csv", append=T, row.names=F, col.names=F,  sep=",")
+write.table(Cibc_df,"/Users/sgchr/Documents/CSDA1050/Data/AllBanks.csv", append=T, row.names=F, col.names=F,  sep=",")
+
+write.table(Rbc_df,"/Users/sgchr/Documents/CSDA1050/Data/Rbc.csv", append=T, row.names=F, col.names=F,  sep=",")
+write.table(Rbc_df,"/Users/sgchr/Documents/CSDA1050/Data/AllBanks.csv", append=T, row.names=F, col.names=F,  sep=",")
+
+write.table(Td_df,"/Users/sgchr/Documents/CSDA1050/Data/Td.csv", append=T, row.names=F, col.names=F,  sep=",")
+write.table(Td_df,"/Users/sgchr/Documents/CSDA1050/Data/AllBanks.csv", append=T, row.names=F, col.names=F,  sep=",")
+
+write.table(Bmo_df,"/Users/sgchr/Documents/CSDA1050/Data/Bmo.csv", append=T, row.names=F, col.names=F,  sep=",")
+write.table(Bmo_df,"/Users/sgchr/Documents/CSDA1050/Data/AllBanks.csv", append=T, row.names=F, col.names=F,  sep=",")
+
+write.table(Bns_df,"/Users/sgchr/Documents/CSDA1050/Data/Bns.csv", append=T, row.names=F, col.names=F,  sep=",")
+write.table(Bns_df,"/Users/sgchr/Documents/CSDA1050/Data/AllBanks.csv", append=T, row.names=F, col.names=F,  sep=",")
+```
+
+#### **2. Exploratory Data Analysis**
+
+Unlike spreasheets and typical databases, tweet contents are unstructured data. To aid in the analysis of unstructured data, we employ a technique to transform the tweets into structured data called the term-document matrix (or document-term matrix if we want the document to be displayed in rows). Documents here are the tweets; and terms are the words in the tweets. Each element in the matrix represents the number of times a particular term (words in the tweets) appears in a particular document (the tweets).
+
+##### 2.1 Create the term-document matrix
+```{r}
+# Load the archived tweets
+AllBanks_csv <- read.csv("/Users/sgchr/Documents/CSDA1050/Data/AllBanks.csv", header = TRUE)
+
+# Build the term-document matrix corpus
+AllBankstext <- iconv(AllBanks_csv$text, to = 'UTF-8')
+corpus <- Corpus(VectorSource(AllBankstext))
+
+# Create term document matrix. Inf or infinity means to ingest everything
+tdm <- TermDocumentMatrix(corpus, control = list(minWordLength=c(1,Inf)))
+inspect(tdm)
+```
+There are 5487 terms in 1623 documents or tweets. 100% sparsity means there are lots of terms occuring zero times in a document.
+
+##### 2.2 Remove terms which have at least 98% of sparse elements
+```{r}
+t <- removeSparseTerms(tdm, sparse=0.98)
+
+# Check sparsity
+inspect(t)
+```
+Number of terms has dropped to 82 and sparsity has dropped to 94%.  We can experiment with sparse=? values to make sure we have sufficient term counts for analysis
+
+##### 2.3 Visualise term counts (or frequency)
+```{r}
+# Convert into matrix for further analysis
+m <- as.matrix(t)
+
+# Plot frequent terms
+freq <- rowSums(m) # Count number of times each of the 82 terms appears
+
+# It will be a very busy group if we plot all 82 terms, so we restrict any terms that appears more > 24x
+freq <- subset(freq, freq>=25)
+
+# Visualise
+barplot(freq, 
+        las=2, # list all words vertically
+        col = rainbow(25))
+```
+There are many stop words that can be removed
+
+##### 2.4 Data processing and normalization
+
+###### 2.4.1 Remove stop words
+```{r}
+corpus <- tm_map(corpus, removeWords, stopwords(kind="en"))
+tdm <- TermDocumentMatrix(corpus, control = list(minWordLength=c(1,Inf)))
+inspect(tdm)
+```
+Term count reduced from 5487 to 5352 (135 stop words have been removed)
+
+###### 2.4.2 Remove terms which have at least 98% of sparse elements
+```{r}
+t <- removeSparseTerms(tdm, sparse=0.98)
+
+# Check sparsity
+inspect(t)
+```
+Term count has reduced to 64 (and with stop words also removed via the precedign code)
+
+###### 2.4.3 Visualise term counts (or frequency)
+```{r}
+# Convert into matrix for further analysis
+m <- as.matrix(t)
+
+# Plot frequent terms
+freq <- rowSums(m) # Count number of times each of the 64 terms appears
+
+# It will be a very busy group if we plot all 64 terms, so we restrict any terms that appears more > 24x
+freq <- subset(freq, freq>=25)
+
+# Visualise
+barplot(freq, 
+        las=2, # list all words vertically
+        col = rainbow(25))
+```
+It is evident that more text cleaning are still needed
+
+##### 2.5 Additional data processing and normalization
+```{r}
+corpus <- tm_map(corpus, tolower) # Not crucial for text analytics but good practice to do so
+corpus <- tm_map(corpus, removePunctuation) # Remove punctuations
+corpus <- tm_map(corpus, removeNumbers) # Remove numbers
+
+# Remove URL
+removeURL <- function(x) gsub('http[[:alnum:]]*', '', x)
+corpus <- tm_map(corpus, content_transformer(removeURL))
+
+# Remove words
+corpus <- tm_map(corpus, removeWords, c('bank', 'the', '$td', '424b2', '…', '$ry', 'fwp', 'amp'))
+
+# Replace words
+corpus <- tm_map(corpus, gsub, pattern = '#stocks', replacement = 'stock')
+corpus <- tm_map(corpus, gsub, pattern = 'stocks', replacement = 'stock')
+
+corpus <- tm_map(corpus, stripWhitespace) # remove leftover from the preceding removal
+
+# Repeat the preceding codes
+tdm <- TermDocumentMatrix(corpus, control = list(minWordLength=c(1,Inf)))
+t <- removeSparseTerms(tdm, sparse=0.98)
+m <- as.matrix(t)
+freq <- rowSums(m)
+freq <- subset(freq, freq>=25)
+barplot(freq, 
+        las=2, # list all words vertically
+        col = rainbow(25))
+```
+The text is mostly cleaned up
+
+##### 2.6 Explore clustering of terms
+```{r}
+# Hierarchical word/tweet clustering using dendrogram 
+# Find the distance, use scale to normalise the matrix
+distance <- dist(scale(m))
+
+# Print the terms, and calculate the distance between the words in each document (tweets)
+print(distance, digits = 2)
+```
+If distance is high, it means those two words should not be in the same cluster; likewise, if distance is low, they should be in the same cluster
+
+##### 2.7 Plot the hierarchical clusters
+```{r}
+hc <- hclust(distance, method = "ward.D")
+plot(hc, hang=-1)
+rect.hclust(hc, k=10) # 10 clusters
+```
+
+##### 2.8 Nonhierarchical k-means clustering of words/tweets
+```{r}
+m1 <- t(m) # Transpose
+k <- 10 # 10 clusters
+kc <- kmeans(m1, k)
+kc
+```
+Observations:
+
+1. There are 10 clusters of sizes 397, 130, 35, etc
+
+2. Cluster means: That is, average of each term being analysed. High average means that word has appeared in the particular cluster with higher frequency. For example, "charges" = 0.986577181, that is the term "charges" appear the highest in cluster 6
+
+3. Clustering vector: We have 1623 terms. This shows which cluster each term has gone to. Example, term 3 went to cluster 7, term 992 went to cluster 2
+
+4. Within cluster sum of squares by cluster: We want this to be low, which means the elements within each cluster are close to each other
+
+5. between_SS / total_SS: We want this to be high, that is, distances between clusters are high
+
+we can experiment with k = ? to maximise between_SS / total_SS
+
+##### 2.9 Find the pair of terms that appears frequently together
+```{r}
+# Term document matrix to convert unstructure text into structured for easier analysis
+tdm <- TermDocumentMatrix(corpus)
+tdm <- as.matrix(tdm)
+tdm[1:25,1:25] # See the first 10 terms in the first 10 documents (tweets)
+```
+Above show how many times each term appears in each tweet. Example "david" appears twice in tweet 4
+
+We can use this table to determine what other terms to remove from analysis
+```{r}
+# Network of terms
+library(igraph) # Network Analysis and Visualization
+tdm[tdm>1] <- 1 # Convert matrix into binary, that is whether a term appears (1) or not (0)
+
+tdm[1:25,1:25]
+```
+Note matrix values are now all binary
+
+###### 2.9.1 Pair of terms that appears frequently together
+```{r}
+# Create term-term matrix
+termM <- tdm %*% t(tdm) # Multiply tdm and transpose of tdm
+termM[1:25,1:25]
+```
+Example: price and canada appear together in 88 tweets
+
+###### 2.9.2 Find the network of terms
+```{r}
+g <- graph.adjacency(termM, weighted = T, mode = 'undirected')
+g
+```
+```{r}
+g <- simplify(g) # To prevent looping of same terms
+V(g)$label <- V(g)$name # Labels for the terms
+V(g)$degree <- degree(g) # How often each term appears
+```
+
+```{r}
+# Histogram of node degree
+hist(V(g)$degree,
+     breaks = 100, # how many bars
+     col = 'green',
+     main = 'Histogram of Node Degree',
+     ylab = 'Frequency',
+     xlab = 'Degree of Vertices')
+```
+Above is a right skewed histogram and most terms appears less than 100 times
+
+```{r}
+# Network diagram
+plot(g)
+```
+Above graph is too busy. One method is to reduce the size of the matrix
+
+```{r}
+tdm <- tdm[rowSums(tdm)>30,] # rowSums counts the total frequency; that is, keep terms that appear > 30 times
+
+# Re-run earlier code
+tdm[tdm>1] <- 1
+termM <- tdm %*% t(tdm)
+termM[1:10,1:10]
+g <- graph.adjacency(termM, weighted = T, mode = 'undirected')
+g
+g <- simplify(g) # To prevent looping of same terms
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+```
+
+```{r}
+# Histogram of node degree
+hist(V(g)$degree,
+     breaks = 100, # how many bars
+     col = 'green',
+     main = 'Histogram of Node Degree',
+     ylab = 'Frequency',
+     xlab = 'Degree of Vertices')
+```
+NOte the historgram is less busy
+
+```{r}
+# Network diagram
+set.seed(222)
+plot(g)
+plot(g,
+     vertex.color='green',
+     vertex.size = 8, # can experiment with this
+     vertex.label.dist = 1.5,
+     vertex.label = NA)
+```
+Much less busy than earlier.  We can experiment with the vertex size to find the optimal network of terms
+
+#### **3. Observations and recommendation**
+
+Based on this exploratory data analysis, we will assess whether the stated research questions are feasible, and as such, whether an edit of the research question is needed
+
+Research Q#1. Which bank has the most favourable / unfavourable trending opinion?
+Comments: ABout 1,623 tweets has been collected since July 7th, 2019, with close 5,500 terms. The collection will increase in the next several weeks. It should be feasible to answer this research question. The main drawback is for the low count of CIBC tweets (40 tweets) versus that of Scotia Bank (661 tweets).  The wide difference will skew the analysis, especially that of CIBC's
+
+Research Q#2. What are the current financial products being discussed?
+Comments: Frequent terms related to banking products are generic ones like, stock, charges, account. Unless we have a much more collection of tweets, it will be difficult to objectibely address this reserach question
+
+Research Q#3. What are the current emotions (anger, fear, anticipation, trust, surprise, sadness, joy, and disgust) towards each bank?
+Comments: Not shown in this Sprint#1 report as the codes are still experimental, the author managed to "see" these emotional terms at the AllBanks level.  Again, dur to the low tweet count for CIBC, it may be difficult to pin down the sentiments, especially in these 8 categories towards CIBC
+
+Research Q#4. What are the current sentiments towards trending financial product segments / categories (and the general network of terms being tweeted)?
+Comments: As stated above, frequent terms related to banking products are generic ones, hence it will be difficult to assess sentiments towards product segments. Network of terms is certainly a possibility
