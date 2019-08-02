@@ -1,48 +1,3 @@
-
-Housing Rent for the major Canadian Cities
-Susiette Adams, Student ID 303594
-July 29 2019
-
-Abstract
-
-This project was assigned by York University 1050 Advanced Analytics Capstone Course. The goal for this project is to find insights from the housing market using analytical tools.
-
-Scope
-
-Here are the boundaries of the project:
-
-Upon completion the results will outline the cities that are most livable / cost effective for renter’s base on the locations.
-Evaluating factors such as household income and market indicators will be used to determine if there are correlations between the costs of the housing in the top Canadian cities.
-Completion of this project will be by August 27th 2019.
-
-Research questions
-
-What are the top 10 cities with the highest and lowest average income?
-What cities have the highest and lowest rent cost?
-What are the Market Indicators that affects rents cost in these cities?
-
-What is needed to be done to run the codes.
-
-Python programming language was used to do perform the analysis. To be able to run the codes and see the outputs you will need to have Python installed on your computer. All libraries that is needed to run the codes have been inputted within the codes.
-
-Introduction and overall approach
-
-Below you won’t be able to see the outputs of the codes because the file was opened in a WordPad document, but you can click on the hyperlink that will take you to the .py python file. There were 3 data sets that were used this analysis and the same approach was used to perform and will be used to complete the feature engineering process and the Exploratory Data Analysis. In the datasets information on all Canada’s provinces were provided along with their cities, but only the cities we will be focusing on.
-
-Loading libraries
-Data Preparation/ loading the data
-Viewing the data contents
-Checking the shape and size of the dataset
-Checking for missing values
-Checking the mean and median
-Checking the correlations of the data
-Checking that data for positive and negative features
-Check the data for the top 10 and bottom 10 cities for apartment prices.
-Create a histogram with the numeric variables
-Create scatterplots to check if the data is good for regression
-Check data for outliers and us box plots to visualize the outlier
-Check the index values
-
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -109,17 +64,17 @@ print(rent.isnull().sum().to_string())
 # In[227]:
 
 
-# Location is one of the most important factors in real estate and the â€˜Citiesâ€™ provides insight into this. 
+# Location is one of the most important factors in real estate and the ‘Cities’ provides insight into this. 
 # We use the .groupby() method to do this so we can take a quick glance at the Cities mean prices
 rent.groupby('City', as_index=True)['1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999',
        '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008',
        '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016'].mean()
 
 
-# We can see the output above and itâ€™s quickly apparent that cities is a major factor in prices. 
+# We can see the output above and it’s quickly apparent that cities is a major factor in prices. 
 
 # Here are the results for median. Note that the values for most Cities prices stayed the say
-# come down with median, which provides the insight that weâ€™re more likely to see outliers on the â€˜high endâ€™ than the low end which is typical in real estate.
+# come down with median, which provides the insight that we’re more likely to see outliers on the ‘high end’ than the low end which is typical in real estate.
 
 # In[229]:
 
@@ -152,7 +107,7 @@ sns.heatmap(corr,
             yticklabels=corr.columns.values)
 
 
-# I used rent.columns to get all the column names with â€˜Cityâ€™.
+# I used rent.columns to get all the column names with ‘City’.
 
 # In[166]:
 
@@ -166,9 +121,9 @@ plt.show()
 # In[114]:
 
 
-# what Iâ€™m doing here is using rent.corr() to get the correlations. I am then turning that information into a dictionary with .to_dict(), 
-# while .items() is turning the correlations into key, value pairs necessary for a dictionary. Weâ€™re correlating by â€˜2014â€™. 
-# We use the lambda expression to order things properly. Finally, we use .sorted() method to sort the values, with the argument â€˜reverse=Trueâ€™,
+# what I’m doing here is using rent.corr() to get the correlations. I am then turning that information into a dictionary with .to_dict(), 
+# while .items() is turning the correlations into key, value pairs necessary for a dictionary. We’re correlating by ‘2014’. 
+# We use the lambda expression to order things properly. Finally, we use .sorted() method to sort the values, with the argument ‘reverse=True’,
 # so that the highest correlation shows up at the top.
 corr_list = sorted(rent.corr().to_dict()['2014'].items(), key=lambda x: x[1], reverse=True)
 corr_list
@@ -258,7 +213,7 @@ sml
 # In[ ]:
 
 
-# In the output above .
+# In the output above there are 7 cities with the lowest prices and 3 provinces which will have to be removed later because we are only interested in the cities.
 
 
 # In[253]:
@@ -384,7 +339,7 @@ income.groupby('Cities', as_index=True)['2006', '2007', '2008', '2009', '2010', 
        '2013', '2014', '2015', '2016', '2017'].mean()
 
 
-# We can see the output above and itâ€™s quickly apparent that Cities is a major factor on the salary.
+# We can see the output above and it’s quickly apparent that Cities is a major factor on the salary.
 
 # In[162]:
 
@@ -425,9 +380,9 @@ plt.show()
 # In[265]:
 
 
-# what Iâ€™m doing is using rent.corr() to get the correlations. I am then turning that information into a dictionary with .to_dict(), 
-# while .items() is turning the correlations into key, value pairs necessary for a dictionary. Weâ€™re correlating by â€˜2014â€™. 
-# We use the lambda expression to order things properly. Finally, we use .sorted() method to sort the values, with the argument â€˜reverse=Trueâ€™,
+# what I’m doing is using rent.corr() to get the correlations. I am then turning that information into a dictionary with .to_dict(), 
+# while .items() is turning the correlations into key, value pairs necessary for a dictionary. We’re correlating by ‘2014’. 
+# We use the lambda expression to order things properly. Finally, we use .sorted() method to sort the values, with the argument ‘reverse=True’,
 # so that the highest correlation shows up at the top.
 corr_list1 = sorted(income.corr().to_dict()['2006'].items(), key=lambda x: x[1], reverse=True)
 corr_list1
@@ -435,7 +390,7 @@ corr_list1
 
 # What this allows us to do is quickly see which features have the most significant (positive or negative) correlations, and also see which features are unlikely to be that relevant. 
 
-# # The rent dataset includes data for all of Canada's provinces and major citiesÂ¶
+# # The rent dataset includes data for all of Canada's provinces and major cities¶
 # For my analysis I will only be focusing on the top cities.
 
 # In[271]:
@@ -594,7 +549,7 @@ print(market.info())
 # In[189]:
 
 
-# We have to sure we set the data up in order to be used in regression weâ€™ll also need to deal with the null values.
+# We have to sure we set the data up in order to be used in regression we’ll also need to deal with the null values.
 # lets take a look at the null values
 print(market.isnull().sum().to_string())
 
@@ -620,7 +575,7 @@ object_vcs_and_no_nulls(market)
 
 
 #Before we transform, we should explore these variables a bit. For some features, there is a clear order 
-#(e.g. a â€˜qualityâ€™ variable that has â€˜Excellentâ€™, â€˜Goodâ€™, â€˜Fairâ€™ and â€˜Poorâ€™ as the possible values).
+#(e.g. a ‘quality’ variable that has ‘Excellent’, ‘Good’, ‘Fair’ and ‘Poor’ as the possible values).
 
 
 # In[295]:
@@ -651,7 +606,7 @@ market.groupby('Indicators', as_index=True)['1991', '1992', '1993', '1994', '199
 # In[ ]:
 
 
-# We can see the output above and itâ€™s quickly apparent that indicators is a major factor in the values.
+# We can see the output above and it’s quickly apparent that indicators is a major factor in the values.
 
 
 # In[302]:
@@ -705,9 +660,9 @@ plt.show()
 # In[308]:
 
 
-# what Iâ€™m doing here is using rent.corr() to get the correlations. I am then turning that information into a dictionary with .to_dict(), 
-# while .items() is turning the correlations into key, value pairs necessary for a dictionary. Weâ€™re correlating by â€˜2015â€™. 
-# We use the lambda expression to order things properly. Finally, we use .sorted() method to sort the values, with the argument â€˜reverse=Trueâ€™,
+# what I’m doing here is using rent.corr() to get the correlations. I am then turning that information into a dictionary with .to_dict(), 
+# while .items() is turning the correlations into key, value pairs necessary for a dictionary. We’re correlating by ‘2015’. 
+# We use the lambda expression to order things properly. Finally, we use .sorted() method to sort the values, with the argument ‘reverse=True’,
 # so that the highest correlation shows up at the top.
 corr_list2 = sorted(explore2.corr().to_dict()['2015'].items(), key=lambda x: x[1], reverse=True)
 corr_list2
@@ -788,30 +743,3 @@ sns.boxplot(data=low)
 
 # There seem to be few outliers in the data which we would have to take a closer look at.
 
-
-
-Observation and recommendation
-
-Base on the exploratory analysis a decision will be made to assess whether the research questions are achievable contrarily if we should review the research questions.
-
-Research question #1
-
-What are the top 10 cities with the highest and lowest average income?
-
-There are 7 cities with the lowest income and 3 provinces they are New Brunswick, Prince Edward Island and Manitoba, but we are only interested in the cities. There are 9 cities with the highest income bracket and 1 province which is not relevant to our analysis because we are only focusing on the cities. We will take some time and exclude these unwanted provinces form our selections.
-
-Research question #2
-
-What cities have the highest and lowest rent cost?
-
-For this question 8 cities were in the top 10 and 2 provinces British Columbia and Ontario which are not relevant for the analysis so we will only focus on the 8 cities. There are 7 cities with the lowest prices and 3 provinces which. This should be achievable to answer the research question by editing the top number. We will have to take some time to exclude the provinces from our selections.
-
-Research question #3
-
-What are the Market Indicators that affects rents cost in these cities?
-
-For this question the top 10 market indicators that affects rent and house prices are residential building permits, completion total, start by intended market, multiple, single detach home owner free hold, apartment, rental, population and row percentage change. The bottom 10 market indicators are real disposal income, rental vacancy, new housing price index, employment rate, rental accommodation cost, consumer price index, unemployment rate, labor force participation, and bachelor. This information shows that we can answer the research question.
-
-Steps to be taken
-
-Our next step is to complete the data cleanup process and assign values in the missing data for the market indicator dataset. Then remove outliers to prepare the datasets for modelling.
