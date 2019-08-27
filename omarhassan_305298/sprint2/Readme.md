@@ -5,22 +5,14 @@ In this sprint we are going to leverage our cleaned data and apply unsupervised 
 #### Summary:
 I discovered that there are 3 segments of podcast listeners.
 1. First segment is: 
-    a. 60% men & 40% female.
-    b. 60% of podcast listenrs reside in either Ontario or British Columbia.
-    c. Top podcast category listen to is Comedy and News & Politics.
-    d. Top average age is about 30 years old, with 50 years old coming next.
+We can tell that cluster one is characterized by Young age, male dominant and their top listening category is Comedy and they mostly live in Ontario and British Columbia and their average top income is 67K per year.
     
-2. Second Segmen is:
-    a. 60% men & 40% female.
-    b. 60% of podcast listenrs reside in either Ontario or Quebec.
-    c. They listen equally to most type of categories.
-    d. Average age is between 30 to 50 years old.
+2. Second Segment is:
+As for Cluster two it is characterized by older age listeners in which it is mostly composed of listeners who are 60 years old or above. They mostly reside in Ontario and Quebec they are male dominant. Their top category they listen to is News/Politics and Society/Culture and they are characterized by high income.
 
-3. Third cluster is:
-    a. 60% men & 40% female.
-    b. 60% of podcast listenrs reside in either Ontario or Quebec.
-    c. They listen equally to most type of categories.
-    d. Average age is above 50-60 years old.op columns.
+3. Third Segment is:
+As for cluster three it is characterized by Young again but it is very female dominant. They mostly reside in Quebec and their top listening category is Comedy similar to Cluster one.
+    
 
 #### Files:
 Please find Sprint2.pynb within Sprint2 Folder which will contain detailed summary and the code used to apply modeling algorithim.
