@@ -4,10 +4,10 @@ In this sprint we are going to share our final report on the entire project. Als
 
 #### Content of the final Report
 
-1	Introduction						
-2	Background						
-3	Research Question					
-4	Methodology						
+1. Introduction						
+2. Background						
+3. Research Question					
+4. Methodology						
     4.1	Data Sources						
     4.2	Cleaning						
     4.3	Data type segregation					
@@ -19,9 +19,9 @@ In this sprint we are going to share our final report on the entire project. Als
         4.4.5	Number of centroids		
         4.4.6	Kmeans Cluster			
         4.4.7	Interpreting Kmeans			
-5	Results						
-6	Discussion						
-7	Conclusion							
+5. Results						
+6. Discussion						
+7. Conclusion							
 
 #### Conclusion
 
@@ -31,3 +31,8 @@ Also, there is an opportunity to deploy this model into an app that help adverti
 
 
 
+
+
+```python
+
+```
