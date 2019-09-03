@@ -1,0 +1,461 @@
+---
+Course: CSDA1050, York University
+Data source: https://www.kaggle.com/roman6335/13000-itunes-podcasts-april-2018/downloads/13000-itunes-podcasts-april-2018.zip/1
+Date: July 24 2019
+Instructor: Matthew Tenney
+Students: Rajkumar Yadhavakrishnan
+Title: Capstone project - Podcast Recommendation
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+# **13,000+ iTunes Podcasts (April 2018)**
+##### *by Rajkumar Yadhavakrishnan* 
+
+#####Analyzing customer description to predict if a customer will recommend the podcasts
+
+#About the Dataset
+
+Podcast exists for near two decades. But it really takes over in recent two years. The podcast meta data may be useful for research in fields like machine learning, social science, or media in general.
+
+Listen Notes is the podcast search engine that actually works. It has the most comprehensive podcast database that you can find on the Internet.
+
+This dataset includes the meta data of 13000 itunes podcasts april 2018.
+
+If you want to play with podcast meta data in CSV files, you can check out Listen Datasets.
+
+Data source: RSS feed of podcasts.
+
+#Below are the column headings
+Name:- Name of the Podcast
+Rating_Volume:-
+Rating:- Rating of the podcast
+description:- Description of the Podcast
+
+#Scope of the article
+Based on the variables, there are several supervised and unsupervised techniques that can could be performed on the above dataset to throw several insights on customer preferences. However, we would limit the scope only to use  text mining extensively to analyze the customer reviews.
+
+#We will be using the following techniques to understand various aspects of text mining:
+#Exploratory analysis of text data (Review Text) individually and based on how it impacts the customer decision to recommend the product (Recommended IND)
+#Classification models that are built based on the review text as the independent variable to predict whether a customer recommends a product
+
+#In terms of text mining approaches, there are 2 broad categories
+#semantic parsing.
+where the word sequence, word usage as noun or verb, hierarchial word structure etc matters
+#Bag of words
+where all the words are analysed as a single token and order does not matter.
+
+Our approach  will only be limited to the “bag of words”. 
+
+#High level approach
+Step 1. Text Extraction & Corpus creation.
+Step 2. Text PreProcessing.
+Step 3. Creating the document term matrix & term document matrix
+Step 4. Exploratory Text analysis 
+Step 5. Feature extraction by removing sparsity 
+Step 6. Classification of models
+
+#Step 1. Text Extraction & Corpus creation.
+
+installing packages:- 
+
+```{r} 
+options(warn=-1)
+suppressMessages(library(qdap))
+suppressMessages(library(dplyr))
+suppressMessages(library(tm))
+suppressMessages(library(wordcloud))
+suppressMessages(library(plotrix))
+suppressMessages(library(dendextend))
+suppressMessages(library(ggplot2))
+suppressMessages(library(ggthemes))
+suppressMessages(library(RWeka))
+suppressMessages(library(reshape2))
+suppressMessages(library(quanteda))
+set.seed(123)
+```
+
+
+#Loading Data:-  Once the required packages are installed, the working directory is set and the csv files are read into R:
+
+```{r}
+setwd("C:/Users/Owner/Desktop/1050 Advanced Analytics and Capstone Course")
+review=read.csv("poddf.csv", stringsAsFactors = FALSE)
+names(review)
+```
+
+#Text extraction
+The column Review.Text contains the customer reviews received.This is the focus for our analysis. We will now try to understand how to represent text as a data frame.
+First, the review.text is converted into a collection of text documents or “Corpus”.
+To convert the text into a corpus, we use the “tm” package in R.
+In order to create a corpus using tm, we need to pass a “Source” object as a parameter to the VCorpus method.
+The source object is similar to an abstract input location. The source we use here is a “Vectorsource” which inputs only character vectors.
+The Review.text column is now converted to a corpus that we call “corpus_review”
+```{r}
+corpus_review=Corpus(VectorSource(review$Description))
+```
+
+#Converting to lower case
+
+```{r}
+corpus_review=tm_map(corpus_review, tolower)
+```
+
+#Removing the punctuation
+```{r}
+corpus_review=tm_map(corpus_review, removePunctuation)
+```
+
+#Removing stopwords:
+
+```{r}
+corpus_review=tm_map(corpus_review, removeWords,c("i","my","time","know","and","the","have","other","a","in","is","with","for","as","our","of","you","de","are","at","it","show","we","by","to","be","or","an","on"))
+```
+
+## Stem document
+
+```{r}
+corpus_review=tm_map(corpus_review, stemDocument)
+```
+
+##Frequently used words
+##We now have a text corpus which is cleaned and only contains the core words required for text mining.
+
+```{r}
+term_count <- freq_terms(corpus_review, 20)
+```
+
+# Find the 20 most frequent terms: term_count
+```{r}
+term_count <- freq_terms(corpus_review, 20)
+```
+
+
+# Plot 20 most frequent terms
+```{r}
+plot(term_count)
+```
+
+##Create the DTM & TDM from the corpus
+
+```{r}
+review_dtm <- DocumentTermMatrix(corpus_review)
+review_tdm <- TermDocumentMatrix(corpus_review)
+```
+
+##The TDM can also used to identify frequent terms and in subsequent visualization related to the review text.
+
+```{r}
+# Convert TDM to matrix
+review_m <- as.matrix(review_tdm)
+# Sum rows and frequency data frame
+review_term_freq <- rowSums(review_m)
+# Sort term_frequency in descending order
+review_term_freq <- sort(review_term_freq, decreasing = T)
+# View the top 10 most common words
+review_term_freq[1:10]
+```
+
+##Exploratory text analysis
+
+```{r}
+# Plot a barchart of the 20 most common words
+barplot(review_term_freq[1:20], col = "steel blue", las = 2)
+```
+
+##Creating Word Clouds
+
+```{r}
+review_word_freq <- data.frame(term = names(review_term_freq),
+  num = review_term_freq)
+# Create a wordcloud for the values in word_freqs
+wordcloud(review_word_freq$term, review_word_freq$num,
+  max.words = 50, colors = "red")
+set.seed(123)
+```
+
+##The word cloud can also receive a set of colors or a color palette as input to distinguish between the more and the lesser frequent words in the cloud.
+
+```{r}
+# Print the word cloud with the specified colors
+wordcloud(review_word_freq$term, review_word_freq$num,
+  max.words = 50, colors = c("aquamarine","darkgoldenrod","tomato"))
+set.seed(123)
+```
+
+##Creating two corpus and Word clouds and merging the corpus
+
+```{r}
+all_yes <- paste(corpus_review, collapse = "")
+all_no <- paste(corpus_review, collapse = "")
+all_combine <- c(all_yes, all_no)
+```
+
+## Creating corpus for combination
+
+```{r}
+## Creating corpus for combination
+corpus_review_all=Corpus(VectorSource(all_combine)) 
+```
+
+## Pre-processing corpus - all
+#Convert to lower-case
+
+```{r}
+## Pre-processing corpus - all
+#Convert to lower-case
+corpus_review_all=tm_map(corpus_review_all, tolower)
+```
+
+#Stem document
+
+```{r}
+corpus_review_all=tm_map(corpus_review_all, stemDocument)
+review_tdm_all <- TermDocumentMatrix(corpus_review_all)
+all_m=as.matrix(review_tdm_all)
+colnames(all_m)=c("Yes","No")
+```
+#Sum rows and frequency data frame
+
+```{r}
+#Sum rows and frequency data frame
+review_term_freq_all <- rowSums(all_m)
+review_word_freq_all <- data.frame(term=names(review_term_freq_all), num = review_term_freq_all)
+```
+
+#Make commonality cloud
+
+```{r}
+#Make commonality cloud
+commonality.cloud(all_m, 
+                  colors = "steelblue1",
+                  max.words = 50)
+set.seed(123)
+```
+
+
+##Polarized tag plot
+##A polarized tag plot is an improved version of the commonality cloud. It determines the frequency of a term used in both the corpora under comparison.
+
+# Identify terms shared by both documents
+```{r}
+common_words <- subset(all_m, all_m[, 1] > 0 & all_m[, 2] > 0)
+```
+
+# calculate common words and difference
+
+```{r}
+
+difference <- abs(common_words[, 1] - common_words[, 2])
+common_words <- cbind(common_words, difference)
+common_words <- common_words[order(common_words[, 3],
+                                   decreasing = T), ]
+head(common_words)
+```
+
+
+
+
+```{r}
+top25_df <- data.frame(x = common_words[1:25, 1],
+                       y = common_words[1:25, 2],
+                       labels = rownames(common_words[1:25, ]))
+```
+
+##Simple word clustering
+##Word clustering is used to identify word groups used together, based on frequency distance. This is a dimension reduction technique. It helps in grouping words into related clusters. Word clusters are visualized with dendrograms.
+
+
+
+```{r}
+review_tdm2 <- removeSparseTerms(review_tdm, sparse = 0.9)
+hc <- hclust(d = dist(review_tdm2, method = "euclidean"), method = "complete")
+# Plot a dendrogram
+plot(hc)
+```
+
+##Word associations
+##Word association is a way of calculating the correlation between 2 words in a DTM or TDM. It is yet another way of identifying words used together frequently
+
+
+```{r}
+# Create associations
+associations <- findAssocs(review_tdm, "fit", 0.05)
+
+# Create associations_df
+associations_df <- list_vect2df(associations)[, 2:3]
+
+# Plot the associations_df values 
+ggplot(associations_df, aes(y = associations_df[, 1])) + 
+  geom_point(aes(x = associations_df[, 2]), 
+             data = associations_df, size = 3) + 
+  ggtitle("Word Associations to 'fit'") + 
+  theme_gdocs()
+```
+
+
+##Use of N-grams
+##All the analysis that we have done so far have been based on single words that are called as Unigrams. However, it can be very insightful to look at multiple words. This is called as N-grams in text mining, where N stands for the number of words. For example, bi-gram contains 2 words.
+
+```{r}
+##Create bi-grams
+review_bigram <- tokens(review$Description) %>%
+    tokens_remove("\\p{P}", valuetype = "regex", padding = TRUE) %>%
+    tokens_remove(stopwords("english"), padding  = TRUE) %>%
+    tokens_ngrams(n = 2) %>%
+    dfm()
+topfeatures(review_bigram)
+```
+
+##Feature extraction by removing sparsity
+
+##Concept of sparsity
+
+#Sparsity is related to the document frequency of a term. In DTM, since the terms form the columns, every document will have several columns each representing one term — a unigram, bi-gram, tri-gram, etc.
+
+##Feature extraction
+#The exploratory text analysis has given several insights based on the customer reviews. We will now use the same review text as predictor variable to predict whether the product will be recommended by the customer. In terms of classification algorithms used, there is not much of a difference between data and text input. We will try 3 of the most popular classification algorithms — CART, Random forest 
+
+```{r}
+## Load the required libraries
+suppressMessages(library(irlba))
+suppressMessages(library(e1071))
+suppressMessages(library(caret))
+suppressMessages(library(randomForest))
+suppressMessages(library(rpart))
+suppressMessages(library(rpart.plot))
+suppressMessages(library(ggplot2))
+suppressMessages(library(SnowballC))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(wordcloud))
+suppressMessages(library(biclust))
+suppressMessages(library(igraph))
+suppressMessages(library(fpc))
+
+```
+
+# Tokenize descriptions
+
+```{r}
+# Tokenize descriptions
+reviewtokens=tokens(review$Description, what="word",
+remove_numbers=TRUE,remove_punct=TRUE, remove_symbols=TRUE, remove_hyphens=TRUE)
+```
+
+# Lowercase the tokens
+
+```{r}
+# Lowercase the tokens
+reviewtokens=tokens_tolower(reviewtokens)
+```
+# remove stop words and unnecessary words
+
+```{r}
+# remove stop words and unnecessary words
+rmwords <- c("dress", "etc", "also", "xxs", "xs", "s")
+reviewtokens=tokens_select(reviewtokens, stopwords(),selection = "remove")
+reviewtokens=tokens_remove(reviewtokens,rmwords)
+```
+# remove stop words and unnecessary words
+
+```{r}
+# remove stop words and unnecessary words
+rmwords <- c("dress", "etc", "also", "xxs", "xs", "s")
+reviewtokens=tokens_select(reviewtokens, stopwords(),selection = "remove")
+reviewtokens=tokens_remove(reviewtokens,rmwords)
+```
+# Stemming tokens
+
+```{r}
+# Stemming tokens
+reviewtokens=tokens_wordstem(reviewtokens,language = "english")
+reviewtokens=tokens_ngrams(reviewtokens,n=1:2)
+```
+
+#The tokens are now converted to a document frequency matrix and treated for sparsity.
+
+# Creating a bag of words
+```{r}
+# Creating a bag of words
+reviewtokensdfm=dfm(reviewtokens,tolower = FALSE)
+
+```
+
+# Remove sparsity
+
+```{r}
+# Remove sparsity
+reviewSparse <- convert(reviewtokensdfm, "tm")
+tm::removeSparseTerms(reviewSparse, 0.7)
+```
+# Create the dfm
+
+```{r}
+# Create the dfm
+dfm_trim(reviewtokensdfm, min_docfreq = 0.3)
+x=dfm_trim(reviewtokensdfm, sparsity = 0.98)
+```
+
+##Building the Classification Models
+
+# Setup a dataframe with features
+
+```{r}
+## Setup a dataframe with features
+df=convert(x,to="data.frame")
+```
+
+##Add the Y variable Recommend.IND
+```{r}
+##Add the Y variable Recommend.IND
+reviewtokensdf=cbind(review$Rating,df)
+head(reviewtokensdf)
+```
+
+## Cleanup names
+```{r}
+## Cleanup names
+names(reviewtokensdf)[names(reviewtokensdf) == "review.Score"] <- "recommend"
+names(reviewtokensdf)=make.names(names(reviewtokensdf))
+head(reviewtokensdf)
+```
+
+## Remove the original review column
+
+```{r}
+## Remove the original review.text column
+reviewtokensdf=reviewtokensdf[,-c(2)]
+head(reviewtokensdf)
+reviewtokensdf$recommend=factor(reviewtokensdf$recommend)
+```
+
+## Build the CART model
+```{r}
+## Build the CART model
+tree=rpart(formula = recommend ~ ., data = reviewtokensdf, method="class",control = rpart.control(minsplit = 200,  minbucket = 30, cp = 0.0001))
+printcp(tree)
+plotcp(tree)
+```
+##Prune down the tree
+
+```{r}
+##Prune down the tree
+bestcp=tree$cptable[which.min(tree$cptable[,"xerror"]),"CP"]
+bestcp
+ptree=prune(tree,cp=bestcp)
+rpart.plot(ptree,cex = 0.6)
+prp(ptree, faclen = 0, cex = 0.5, extra = 2)
+```
+
+##Random forest
+
+#The next classification algorithm we will use is the Random forest. We will examine the varimp plot of the randomforest model to understand which words affect the classification the most.
+
+```{r}
+library(randomForest)
+reviewRF=randomForest(recommend~., data=reviewtokensdf)
+varImpPlot(reviewRF, cex=.7)
+```
+In sync with the CART model, the varimp plot of the Random forest model also , words like “High Rec”, “recommend”, “I would”,  etc are used by happy customers — i.e., customers do recommend the product. The tree can be interpreted further to understand the word patterns used by customers who recommend the product vs those who don’t.
+
